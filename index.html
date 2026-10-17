@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1220"><title>Deriv Digit Analyzer Live</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--line:#263650;--text:#edf3ff;--muted:#9aabc4;--green:#35d39a;--red:#ff6d7d;--blue:#73a7ff;--gold:#ffc96b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#172b4c 0,#0b1220 42%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1120px;margin:auto;padding:22px 15px 44px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:15px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:45px;height:45px;border-radius:13px;background:linear-gradient(135deg,#5c94ff,#7d68ff);font-weight:900;font-size:20px}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.title{font-size:clamp(25px,4vw,36px);font-weight:850;letter-spacing:-.04em;margin:2px 0}.sub{color:var(--muted);max-width:760px;margin:0 0 18px}.pill{border:1px solid #35506e;background:#14243a;color:#c9d9f2;padding:7px 11px;border-radius:99px;font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{background:linear-gradient(180deg,rgba(22,35,56,.97),rgba(15,26,43,.98));border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 12px 32px #0002}.panel h2{font-size:17px;margin:0 0 5px}.hint{color:var(--muted);font-size:13px;margin:0 0 15px}.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{flex:1;min-width:130px}.field label{display:block;color:#bdcbe0;font-size:12px;margin:0 0 6px;font-weight:700}
+input,select{width:100%;border:1px solid #344762;background:#0c1728;color:var(--text);border-radius:10px;padding:11px;font:inherit;min-height:43px}button{border:0;border-radius:10px;background:linear-gradient(135deg,#6ba0ff,#806aff);color:#081226;font-weight:850;padding:11px 15px;cursor:pointer;font-size:14px;min-height:42px}button.secondary{background:#243651;color:#e7efff;border:1px solid #3a506e}button.danger{background:#3a202b;color:#ffdce1;border:1px solid #70404c}button:disabled{opacity:.5;cursor:not-allowed}.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{margin-top:12px;padding:11px;border-radius:10px;background:#17263b;border:1px solid #304760;color:#c8d8ed;font-size:13px;overflow-wrap:anywhere}.status.good{border-color:#236c59;color:#b7f6df}.status.bad{border-color:#75404b;color:#ffd3d9}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:13px}.metric{padding:12px;background:#0d192b;border:1px solid #263951;border-radius:12px;min-width:0}.k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.v{font-size:23px;font-weight:850;margin-top:3px;overflow-wrap:anywhere}.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}.gold{color:var(--gold)}.results{display:grid;grid-template-columns:1fr 1fr;gap:9px}.result{padding:13px;border-radius:12px;background:#0c1728;border:1px solid #2a3b54}.result h3{font-size:12px;margin:0 0 5px;color:#dce7f9}.big{font-size:22px;font-weight:850}.small{font-size:12px;color:var(--muted)}.barlist{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;margin:13px 0}.digit{background:#0c1728;border:1px solid #2a3d58;border-radius:8px;padding:8px 2px;text-align:center;min-width:0}.digit strong{display:block;font-size:15px}.digit span{font-size:10px;color:var(--muted)}.track{height:5px;background:#26364d;border-radius:8px;overflow:hidden;margin-top:5px}.fill{height:100%;background:linear-gradient(90deg,#5d9aff,#53d8b0)}.tablewrap{overflow:auto;max-height:210px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:7px;border-bottom:1px solid #263650}th{color:var(--muted);font-weight:700}.warning{margin-top:15px;border:1px solid #6d5630;background:#2a2419;color:#f7dfb4;border-radius:13px;padding:13px;font-size:13px}.footer{color:#7f91ac;font-size:12px;margin-top:17px}a{color:#a9c9ff}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.panel{padding:15px}.metrics{grid-template-columns:repeat(3,1fr)}}@media(max-width:390px){.metrics{grid-template-columns:1fr}.results{grid-template-columns:1fr}.barlist{gap:3px}.digit{padding:7px 0}.digit span{font-size:9px}}
+</style></head>
+<body><main>
+<header class="top"><div class="brand"><div class="logo">D</div><div><div class="eyebrow">Live market data · Statistics</div><div class="title">Deriv Digit Analyzer</div></div></div><div id="connectionPill" class="pill">● Disconnected</div></header>
+<p class="sub">Connect to Deriv's public market-data stream, collect live ticks, and calculate descriptive last-digit frequencies for Over/Under and Matches/Differs. This dashboard does not place trades.</p>
+<div class="grid">
+<section class="panel"><h2>1. Live connection</h2><p class="hint">Public market data only. No trading-account token is requested.</p>
+<div class="row"><div class="field"><label for="appId">Deriv App ID</label><input id="appId" inputmode="numeric" value="1089" placeholder="Your registered App ID"></div><div class="field"><label for="symbol">Market symbol</label><select id="symbol"><option value="1HZ100V">Volatility 100 (1s) · 1HZ100V</option><option value="R_100">Volatility 100 · R_100</option><option value="1HZ50V">Volatility 50 (1s) · 1HZ50V</option><option value="R_50">Volatility 50 · R_50</option><option value="1HZ25V">Volatility 25 (1s) · 1HZ25V</option><option value="R_25">Volatility 25 · R_25</option><option value="1HZ10V">Volatility 10 (1s) · 1HZ10V</option><option value="R_10">Volatility 10 · R_10</option></select></div></div>
+<div class="row" style="margin-top:10px"><div class="field"><label for="historyCount">Initial history (ticks)</label><select id="historyCount"><option value="100">100</option><option value="250" selected>250</option><option value="500">500</option><option value="1000">1000</option></select></div><div class="field"><label for="windowSize">Analysis window</label><select id="windowSize"><option>50</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></div></div>
+<div class="btnrow"><button id="connectBtn" onclick="connectLive()">Connect & load history</button><button class="secondary" id="stopBtn" onclick="disconnect()" disabled>Disconnect</button><button class="secondary" onclick="clearTicks()">Clear sample</button></div><div id="connectionStatus" class="status">Not connected. Enter your own App ID for dependable use, then connect.</div>
+<div class="metrics"><div class="metric"><div class="k">Ticks stored</div><div id="tickTotal" class="v">0</div></div><div class="metric"><div class="k">Latest quote</div><div id="quote" class="v">—</div></div><div class="metric"><div class="k">Last digit</div><div id="lastDigit" class="v blue">—</div></div></div></section>
+<section class="panel"><h2>2. Contract barriers</h2><p class="hint">Rates are computed from the current analysis window, using strict over/under comparisons.</p>
+<div class="row"><div class="field"><label for="barrier">Over / Under barrier</label><select id="barrier"><option>0</option><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div><div class="field"><label for="target">Matches / Differs digit</label><select id="target"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div></div>
+<div class="results" style="margin-top:13px"><div class="result"><h3>OVER barrier</h3><div id="overRate" class="big green">—</div><div id="overCount" class="small">—</div></div><div class="result"><h3>UNDER barrier</h3><div id="underRate" class="big red">—</div><div id="underCount" class="small">—</div></div><div class="result"><h3>MATCHES target</h3><div id="matchRate" class="big blue">—</div><div id="matchCount" class="small">—</div></div><div class="result"><h3>DIFFERS target</h3><div id="diffRate" class="big gold">—</div><div id="diffCount" class="small">—</div></div></div>
+<div id="interpretation" class="status">Connect to a market to calculate sample statistics.</div></section>
+</div>
+<section class="panel" style="margin-top:15px"><h2>3. Digit distribution</h2><p class="hint">Frequency and percentage for each last digit in the selected analysis window.</p>
+<div class="metrics"><div class="metric"><div class="k">Window size</div><div id="windowActual" class="v">0</div></div><div class="metric"><div class="k">Most frequent</div><div id="common" class="v">—</div></div><div class="metric"><div class="k">Least frequent</div><div id="rare" class="v">—</div></div></div><div id="distribution" class="barlist"></div><p class="small">These are observed proportions, not reliable forecasts of the next tick. Random-like markets can produce streaks and uneven short samples.</p></section>
+<section class="panel" style="margin-top:15px"><h2>4. Recent tick log</h2><p class="hint">Newest ticks first. Log is held in page memory and clears when the page is reloaded.</p><div class="tablewrap"><table><thead><tr><th>Time</th><th>Quote</th><th>Last digit</th></tr></thead><tbody id="tickRows"><tr><td colspan="3" class="small">No ticks received yet.</td></tr></tbody></table></div></section>
+<div class="warning"><b>Risk and accuracy notice:</b> This is an independent statistics tool, not an official Deriv product or a signal service. Historical rates do not establish the true probability of the next tick and do not guarantee profit. Over/Under outcomes equal to the barrier are neither over nor under. Confirm the market's contract definitions before use. No trades are placed and no account credentials are needed.</div>
+<div class="footer">Market data is requested from Deriv directly by your browser. A registered App ID may be required by the WebSocket endpoint. Do not enter a password, API token, or private account key here.</div>
+</main>
+<script>
+let ws=null, ticks=[], recentRows=[], reconnectTimer=null, requestHistory=false;
+const $=id=>document.getElementById(id);
+function setStatus(msg,kind=''){ $('connectionStatus').textContent=msg; $('connectionStatus').className='status '+kind; }
+function pct(n,d){return d?(100*n/d).toFixed(1)+'%':'—';}
+function digitFromQuote(quote,pipSize){
+  const decimals=Number.isInteger(pipSize)?Math.max(0,Math.min(10,pipSize)):2;
+  const fixed=Number(quote).toFixed(decimals);
+  const digits=fixed.replace(/\D/g,'');
+  return Number(digits.slice(-1));
+}
+function updateStats(){
+ const n=Math.min(ticks.length,Number($('windowSize').value)||100), data=ticks.slice(-n), count=Array(10).fill(0);
+ data.forEach(t=>count[t.digit]++);
+ const barrier=Number($('barrier').value), target=Number($('target').value);
+ const over=data.filter(t=>t.digit>barrier).length, under=data.filter(t=>t.digit<barrier).length;
+ const equal=data.filter(t=>t.digit===barrier).length, match=count[target], differ=data.length-match;
+ $('windowActual').textContent=data.length;
+ $('overRate').textContent=pct(over,data.length); $('underRate').textContent=pct(under,data.length);
+ $('matchRate').textContent=pct(match,data.length); $('diffRate').textContent=pct(differ,data.length);
+ $('overCount').textContent=over+' / '+data.length+' digits > '+barrier;
+ $('underCount').textContent=under+' / '+data.length+' digits < '+barrier;
+ $('matchCount').textContent=match+' / '+data.length+' exact '+target+'s';
+ $('diffCount').textContent=differ+' / '+data.length+' not '+target;
+ $('interpretation').textContent=data.length?`Barrier ${barrier}: ${equal} digit(s) equalled the barrier and count as neither strictly Over nor strictly Under. These sample proportions describe the last ${data.length} ticks only; they are not a prediction.`:'Waiting for tick data.';
+ const max=Math.max(0,...count), min=Math.min(...count);
+ $('common').textContent=data.length?count.indexOf(max)+' ('+max+')':'—';
+ $('rare').textContent=data.length?count.indexOf(min)+' ('+min+')':'—';
+ $('distribution').innerHTML=count.map((c,d)=>`<div class="digit"><strong>${d}</strong><span>${c} · ${pct(c,data.length)}</span><div class="track"><div class="fill" style="width:${max?c/max*100:0}%"></div></div></div>`).join('');
+ $('tickTotal').textContent=ticks.length;
+}
+function renderRows(){
+ $('tickRows').innerHTML=recentRows.length?recentRows.map(t=>`<tr><td>${new Date(t.epoch*1000).toLocaleTimeString()}</td><td>${t.quote}</td><td><b>${t.digit}</b></td></tr>`).join(''):'<tr><td colspan="3" class="small">No ticks received yet.</td></tr>';
+}
+function handleTick(tick){
+ if(!tick||tick.quote===undefined)return;
+ const pip=Number.isInteger(tick.pip_size)?tick.pip_size:2;
+ const quote=Number(tick.quote).toFixed(pip), digit=digitFromQuote(tick.quote,pip);
+ const item={quote,digit,epoch:tick.epoch||Math.floor(Date.now()/1000)};
+ ticks.push(item); const max=Math.max(1000,Number($('windowSize').value)||100);
+ if(ticks.length>max) ticks=ticks.slice(-max);
+ recentRows.unshift(item); recentRows=recentRows.slice(0,12);
+ $('quote').textContent=quote; $('lastDigit').textContent=digit; updateStats(); renderRows();
+}
+function connectLive(){
+ disconnect(false);
+ const appId=$('appId').value.trim();
+ if(!/^\d+$/.test(appId)){setStatus('Enter a numeric Deriv App ID.','bad');return;}
+ const symbol=$('symbol').value, historyCount=Number($('historyCount').value);
+ $('connectBtn').disabled=true; setStatus('Connecting to Deriv and requesting recent history…');
+ // Legacy public market-data WebSocket. This connection only reads public data.
+ try{ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id='+encodeURIComponent(appId));}
+ catch(e){setStatus('Could not create WebSocket: '+e.message,'bad');$('connectBtn').disabled=false;return;}
+ ws.onopen=()=>{
+   $('connectionPill').textContent='● Connected';$('connectionPill').style.color='var(--green)';
+   $('stopBtn').disabled=false;setStatus('Connected. Loading historical ticks, then subscribing to live ticks.','good');
+   ws.send(JSON.stringify({ticks_history:symbol,count:historyCount,end:'latest',style:'ticks',req_id:10}));
+   ws.send(JSON.stringify({ticks:symbol,subscribe:1,req_id:11}));
+ };
+ ws.onmessage=ev=>{
+   let msg;try{msg=JSON.parse(ev.data)}catch{return}
+   if(msg.error){setStatus('Deriv API: '+(msg.error.message||'Request failed')+' Check App ID, symbol and connection.','bad');return}
+   if(msg.msg_type==='history'&&msg.history){
+     const prices=msg.history.prices||[], times=msg.history.times||[];
+     const pip=Number.isInteger(msg.pip_size)?msg.pip_size:2;
+     const hist=prices.map((p,i)=>({quote:Number(p).toFixed(pip),digit:digitFromQuote(p,pip),epoch:times[i]||Math.floor(Date.now()/1000)}));
+     // History is older than incoming subscribed ticks; avoid duplicates from a later stream.
+     ticks=hist.slice(-Math.max(1000,Number($('windowSize').value)||100));
+     recentRows=ticks.slice(-12).reverse();
+     if(ticks.length){$('quote').textContent=ticks[ticks.length-1].quote;$('lastDigit').textContent=ticks[ticks.length-1].digit;}
+     updateStats();renderRows();setStatus('Loaded '+hist.length+' historical ticks. Listening for live updates.','good');
+   }
+   if(msg.msg_type==='tick'&&msg.tick)handleTick(msg.tick);
+ };
+ ws.onerror=()=>setStatus('WebSocket connection error. Check internet, App ID and whether the endpoint is reachable.','bad');
+ ws.onclose=()=>{ $('connectionPill').textContent='● Disconnected';$('connectionPill').style.color='';$('connectBtn').disabled=false;$('stopBtn').disabled=true;if(ws)setStatus('Connection closed. Tap Connect & load history to retry.'); };
+}
+function disconnect(update=true){
+ if(ws){const old=ws;ws=null;old.onclose=null;try{old.close()}catch{}}
+ $('connectionPill').textContent='● Disconnected';$('connectionPill').style.color='';$('connectBtn').disabled=false;$('stopBtn').disabled=true;
+ if(update)setStatus('Disconnected. Existing sample remains until cleared or reloaded.');
+}
+function clearTicks(){ticks=[];recentRows=[];$('quote').textContent='—';$('lastDigit').textContent='—';updateStats();renderRows();setStatus('Sample cleared. Connect to load fresh history.');}
+['barrier','target','windowSize'].forEach(id=>$(id).addEventListener('change',updateStats));
+window.addEventListener('beforeunload',()=>{if(ws)ws.close()});
+updateStats();
+</script></body></html>
